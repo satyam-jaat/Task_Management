@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student_Management</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2A363B;
+            margin: 0;
+            height:2000px;
+            padding: 20px;
+            /* border: 7px solid #000; */
+        }
+
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Task List */
+        .task-list {
+            margin-bottom: 20px;
+            margin-left: -150px;
+            display: flex;
+            gap: 10px;
+            border:none;
+        }
+
+        .task-list input[type="text"] {
+            width: 15%;
+            padding: 5px;
+            border: none;
+            font-size: 14px;
+            border-radius: 8px;
+            border-width: 2px;
+        }
+
+        /* Delete button style */
+        #delete-task-btn {
+            background-color: rgb(227, 22, 22);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            top: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            display: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+            /* Initially hidden */
+        }
+
+        #delete-task-btn:hover {
+            background-color: rgb(103, 0, 0);
+            border: none;
+        }
+
+        #save-btn {
+            width: 40%;
+            padding: 10px 20px;
+            border:none;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            margin-left: 170px;
+            cursor: pointer;
+        }
+
+        #save-btn:hover {
+            background-color: rgb(112, 112, 112);
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
+
+        /* Notification styling */
+        .notification {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 75%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        #add-task {
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border:none;
+            cursor: pointer;
+        }
+
+        #add-task:hover {
+            background-color: #45a049;
+            color: white;
+            border:none;
+        }
+
+        #refresh-btn {
+            position: fixed;
+            bottom: 10px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none;
+            /* Initially hide the button */
+            z-index: 9999;
+            /* Ensure it's on top of everything else */
+        }
+
+
+        /* CSS to make sure all boxes are on the right side and stacked vertically */
+        .priority-container {
+            position: absolute;
+            top: 25px;
+            right: 20px;
+            width: 300px;
+            /* Adjust width of the container for the boxes */
+            display: flex;
+            flex-direction: column;
+            /* Stack the boxes vertically */
+            gap: 15px;
+            /* Space between each box */
+            max-height: 2000px;
+            /* Ensure they don't overflow */
+            overflow-y: auto;
+            /* Allow scrolling if content overflows */
+        }
+
+        .todo-container,
+        .priority-box {
+            background-color: #596b75;
+            border-radius: 8px;
+            padding: 15px;
+            border:none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .todo-container h2,
+        .priority-box h2 {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bolder;
+            margin-bottom: 10px;
+        }
+
+        /* Style for input and button in each box */
+        .todo-container input[type="text"],
+        .priority-box input[type="text"] {
+            width: 50%;
+            padding: 8px;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        .todo-container button,
+        .priority-box button {
+            width: 35%;
+            padding: 8px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .todo-container button:hover,
+        .priority-box button:hover {
+            background-color: #45a049;
+        }
+
+        .todo-container ul,
+        .priority-box ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .todo-container ul li,
+        .priority-box ul li {
+            padding: 6px;
+            background-color: #353E43;
+            border-radius: 4px;
+            color: white;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .todo-container ul li input[type="checkbox"],
+        .priority-box ul li input[type="checkbox"] {
+            margin-left: 10px;
+        }
+
+        .todo-container ul li:hover,
+        .priority-box ul li:hover {
+            background-color: #16131A;
+        }
+
+
+        /* Style for the line chart container */
+        #line-chart-container {
+            width: 94%;
+            margin: 20px auto;
+            margin-left: -150px;
+            text-align: center;
+            background-color: #264653;
+            /* Dark background for the chart container */
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+            /* Shadow for a more pronounced look */
+        }
+
+        /* Optional: Adjust the canvas size if needed */
+        #completionChart {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Table styling */
+        .schedule-table {
+            width: 98%;
+            margin-top: 20px;
+            margin-left: -150px;
+        }
+
+        .schedule-table th,
+        .schedule-table td {
+            padding: 0px;
+            font-size: 13px;
+            height: 30px;
+            /* Fixed height for each cell */
+
+            vertical-align: middle;
+            /* Align content vertically in the center */
+        }
+
+        .schedule-table th {
+            background-color: #e99d9d;
+        }
+
+        .schedule-table td input[type="checkbox"] {
+            width: 20px;
+            height: 18px;
+            margin: 0 auto;
+            /* Center checkbox inside the cell */
+            display: block;
+
+        }
+
+        .empty {
+            background-color: #f8f8f8;
+        }
+
+        /* Alternating background colors for dates */
+        .schedule-table th:nth-child(even),
+        /* Even columns in the header (dates) */
+        .schedule-table td:nth-child(even) {
+            /* Even columns in the table body (checkboxes) */
+            background-color: #89959c;
+            /* Light gray background for even columns */
+        }
+
+        .schedule-table th:nth-child(odd),
+        /* Odd columns in the header (dates) */
+        .schedule-table td:nth-child(odd) {
+            /* Odd columns in the table body (checkboxes) */
+            background-color: #b3b3b3;
+            /* White background for odd columns */
+        }
+
+        /* Styling for the completion percentage row */
+        #completion-row td {
+            text-align: center;
+            font-weight: bold;
+            background-color: #f3f3f3;
+            padding: 0px;
+        }
+
+        /* Make the table responsive */
+        @media screen and (max-width: 768px) {
+
+            .schedule-table th,
+            .schedule-table td {
+                padding: 0px;
+            }
+
+            .schedule-table td input[type="checkbox"] {
+                width: 15px;
+                height: 15px;
+            }
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- <h1 style="color: white;">Complete the tasks</h1> -->
+
+        <!-- Input to add new task -->
+        <div class="task-list">
+            <!-- <label for="new-task">New Task:</label> -->
+            <input type="text" id="new-task" placeholder="Enter a task...">
+            <button id="add-task">Add Task</button>
+            <button id="delete-task-btn" style="margin-left: 0px;">Delete Task</button>
+
+        </div>
+
+
+
+        <!-- Table for the schedule -->
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th class="empty"></th>
+                    <th>1</th>
+                    <th>2</th>
+                    <th>3</th>
+                    <th>4</th>
+                    <th>5</th>
+                    <th>6</th>
+                    <th>7</th>
+                    <th>8</th>
+                    <th>9</th>
+                    <th>10</th>
+                    <th>11</th>
+                    <th>12</th>
+                    <th>13</th>
+                    <th>14</th>
+                    <th>15</th>
+                    <th>16</th>
+                    <th>17</th>
+                    <th>18</th>
+                    <th>19</th>
+                    <th>20</th>
+                    <th>21</th>
+                    <th>22</th>
+                    <th>23</th>
+                    <th>24</th>
+                    <th>25</th>
+                    <th>26</th>
+                    <th>27</th>
+                    <th>28</th>
+                    <th>29</th>
+                    <th>30</th>
+                    <th>31</th>
+                </tr>
+            </thead>
+            <tbody id="task-rows">
+                <!-- Task rows will be dynamically added here -->
+            </tbody>
+            <tfoot>
+                <tr id="completion-row">
+                    <td><strong>Completion (%)</strong></td>
+                    <!-- Empty cells for each date (1–31) -->
+                    <td id="completion-1"></td>
+                    <td id="completion-2"></td>
+                    <td id="completion-3"></td>
+                    <td id="completion-4"></td>
+                    <td id="completion-5"></td>
+                    <td id="completion-6"></td>
+                    <td id="completion-7"></td>
+                    <td id="completion-8"></td>
+                    <td id="completion-9"></td>
+                    <td id="completion-10"></td>
+                    <td id="completion-11"></td>
+                    <td id="completion-12"></td>
+                    <td id="completion-13"></td>
+                    <td id="completion-14"></td>
+                    <td id="completion-15"></td>
+                    <td id="completion-16"></td>
+                    <td id="completion-17"></td>
+                    <td id="completion-18"></td>
+                    <td id="completion-19"></td>
+                    <td id="completion-20"></td>
+                    <td id="completion-21"></td>
+                    <td id="completion-22"></td>
+                    <td id="completion-23"></td>
+                    <td id="completion-24"></td>
+                    <td id="completion-25"></td>
+                    <td id="completion-26"></td>
+                    <td id="completion-27"></td>
+                    <td id="completion-28"></td>
+                    <td id="completion-29"></td>
+                    <td id="completion-30"></td>
+                    <td id="completion-31"></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <!-- Line chart container -->
+        <div id="line-chart-container">
+            <canvas id="completionChart" width="400" height="150"></canvas>
+        </div>
+
+    </div>
+
+
+    <!-- Right Side Container -->
+    <div class="priority-container">
+        <!-- To-Do Box -->
+        <button id="save-btn">Save Data</button>
+
+        <div class="todo-container">
+            <h2>To-Do</h2>
+            <input type="text" id="todo-task" placeholder="Enter Task...">
+            <button id="add-todo-btn">Add To-Do</button>
+            <ul id="todo-list"></ul>
+        </div>
+
+        <!-- Top Priority Box -->
+        <div class="priority-box">
+            <h2>Top Priority</h2>
+            <input type="text" id="top-priority" placeholder="Enter Task...">
+            <button id="add-top-priority-btn">Add Priority</button>
+            <ul id="top-priority-list"></ul>
+        </div>
+
+        <!-- Low Priority Box -->
+        <div class="priority-box">
+            <h2>Low Priority</h2>
+            <input type="text" id="low-priority" placeholder="Enter Task...">
+            <button id="add-low-priority-btn">Add Priority</button>
+            <ul id="low-priority-list"></ul>
+        </div>
+    </div>
+
+    <div id="notification" class="notification">Task Data saved successfully!</div>
+
+    <button id="refresh-btn"
+        style=" bottom: 10px; right: 20px; padding: 10px 20px; background-color: #ff5722; color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+        Reset
+    </button>
+
+
+    <script>
+        const taskInput = document.getElementById('new-task');
+        const taskTableBody = document.querySelector("#task-table tbody");
+        const addTaskButton = document.getElementById('add-task');
+        const deleteTaskButton = document.getElementById('delete-task-btn');
+        const saveButton = document.getElementById('save-btn'); // Reference the Save button from HTML
+        const taskRows = document.getElementById('task-rows');
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || []; // Load tasks from localStorage
+
+        const taskCompletion = Array(31).fill(0);
+        const totalCompletionBox = document.getElementById('total-completion');
+
+        function addTaskRow(task) {
+            const { id, name, completedDays } = task;
+            const newRow = document.createElement('tr');
+            newRow.dataset.taskId = id;
+
+            const taskCell = document.createElement('td');
+            taskCell.innerHTML = `<strong>${name}</strong>`;
+            newRow.appendChild(taskCell);
+
+            for (let i = 1; i <= 31; i++) {
+                const checkboxCell = document.createElement('td');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.classList.add('checkbox');
+                checkbox.dataset.day = i;
+                if (completedDays.includes(i)) {
+                    checkbox.checked = true;
+                }
+                checkboxCell.appendChild(checkbox);
+                newRow.appendChild(checkboxCell);
+
+                checkbox.addEventListener('change', function () {
+                    if (checkbox.checked) {
+                        completedDays.push(i);
+                    } else {
+                        const index = completedDays.indexOf(i);
+                        if (index > -1) {
+                            completedDays.splice(index, 1);
+                        }
+                    }
+                    updateCompletionPercentage(i);
+                    updateTotalCompletion();
+                });
+            }
+
+            taskRows.appendChild(newRow);
+            deleteTaskButton.style.display = 'block';
+
+            for (let i = 1; i <= 31; i++) {
+                updateCompletionPercentage(i);
+            }
+        }
+
+        function updateCompletionPercentage(day) {
+            const checkboxes = document.querySelectorAll(`input[data-day="${day}"]`);
+            const totalCheckboxes = checkboxes.length;
+            if (totalCheckboxes === 0) return;
+
+            const completedCheckboxes = Array.from(checkboxes).filter(checkbox => checkbox.checked).length;
+            const percentage = (completedCheckboxes / totalCheckboxes) * 100;
+            const completionCell = document.getElementById(`completion-${day}`);
+            if (completionCell) {
+                completionCell.textContent = percentage === 0 ? '' : `${Math.round(percentage)}%`;
+            }
+        }
+
+        function updateTotalCompletion() {
+            let totalPercentage = 0;
+            let daysWithCompletion = 0;
+            for (let i = 1; i <= 31; i++) {
+                const completionCell = document.getElementById(`completion-${i}`);
+                if (completionCell && completionCell.textContent) {
+                    const percentage = parseInt(completionCell.textContent, 10);
+                    if (!isNaN(percentage)) {
+                        totalPercentage += percentage;
+                        daysWithCompletion++;
+                    }
+                }
+            }
+            const totalCompletionPercentage = daysWithCompletion > 0 ? totalPercentage / daysWithCompletion : 0;
+            totalCompletionBox.textContent = `Total Completion: ${Math.round(totalCompletionPercentage)}%`;
+        }
+
+        window.onload = function () {
+            tasks.forEach(task => addTaskRow(task));
+            updateTotalCompletion();
+        };
+
+        addTaskButton.addEventListener('click', function () {
+            const taskName = taskInput.value.trim();
+            if (taskName) {
+                const taskId = tasks.length + 1;
+                const newTask = { id: taskId, name: taskName, completedDays: [] };
+                tasks.push(newTask);
+                addTaskRow(newTask);
+                taskInput.value = '';
+            } else {
+                alert('Please enter a task name.');
+            }
+        });
+
+        deleteTaskButton.addEventListener('click', function () {
+            const taskNames = tasks.map(task => task.name);
+            const taskToDelete = prompt(`Which task would you like to delete?\n\n${taskNames.join('\n')}`);
+            if (taskToDelete && taskNames.includes(taskToDelete)) {
+                deleteTask(taskToDelete);
+            } else {
+                alert('Task not found.');
+            }
+        });
+
+        function deleteTask(taskName) {
+            const taskToDelete = tasks.find(task => task.name === taskName);
+            if (taskToDelete) {
+                tasks = tasks.filter(task => task.id !== taskToDelete.id);
+                localStorage.setItem('tasks', JSON.stringify(tasks)); // Save to localStorage
+                const rowToDelete = taskRows.querySelector(`tr[data-task-id="${taskToDelete.id}"]`);
+                if (rowToDelete) taskRows.removeChild(rowToDelete);
+                if (tasks.length === 0) deleteTaskButton.style.display = 'none';
+                for (let i = 1; i <= 31; i++) updateCompletionPercentage(i);
+                updateTotalCompletion();
+            }
+        }
+        const notification = document.getElementById('notification');
+
+        saveButton.addEventListener('click', function () {
+            localStorage.setItem('tasks', JSON.stringify(tasks)); // Save to localStorage
+
+            // Show notification
+            notification.style.display = 'block';
+
+            // Hide notification after 1 second
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 1000);
+        });
+
+        // The rest of your original code remains unchanged...
+
+        // The rest of your original code remains unchanged...
+        const todoInput = document.getElementById('todo-task');
+        const addTodoButton = document.getElementById('add-todo-btn');
+        const todoList = document.getElementById('todo-list');
+        const topPriorityInput = document.getElementById('top-priority');
+        const addTopPriorityButton = document.getElementById('add-top-priority-btn');
+        const topPriorityList = document.getElementById('top-priority-list');
+        const lowPriorityInput = document.getElementById('low-priority');
+        const addLowPriorityButton = document.getElementById('add-low-priority-btn');
+        const lowPriorityList = document.getElementById('low-priority-list');
+
+        function loadTasks() {
+            const todoTasks = JSON.parse(localStorage.getItem('todoTasks')) || [];
+            const topPriorityTasks = JSON.parse(localStorage.getItem('topPriorityTasks')) || [];
+            const lowPriorityTasks = JSON.parse(localStorage.getItem('lowPriorityTasks')) || [];
+            todoTasks.forEach(task => addTodoTask(task));
+            topPriorityTasks.forEach(task => addPriorityTask(task, topPriorityList));
+            lowPriorityTasks.forEach(task => addPriorityTask(task, lowPriorityList));
+        }
+
+        function addTodoTask(task) {
+            if (!task.trim()) return;
+
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `
+<input type="checkbox" class="task-checkbox">
+<span>${task}</span>
+`;
+
+            listItem.querySelector('.task-checkbox').addEventListener('change', function () {
+                if (this.checked) {
+                    todoList.removeChild(listItem);
+                    updateLocalStorage();
+                }
+            });
+
+            todoList.appendChild(listItem);
+        }
+
+        function addPriorityTask(taskText, list) {
+            if (!taskText.trim()) return;
+
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `
+<input type="checkbox" class="task-checkbox">
+<span>${taskText}</span>
+`;
+
+            listItem.querySelector('.task-checkbox').addEventListener('change', function () {
+                if (this.checked) {
+                    list.removeChild(listItem);
+                    updateLocalStorage();
+                }
+            });
+
+            list.appendChild(listItem);
+        }
+
+        function updateLocalStorage() {
+            const todoTasks = [];
+            const topPriorityTasks = [];
+            const lowPriorityTasks = [];
+            todoList.querySelectorAll('li span').forEach(span => {
+                todoTasks.push(span.textContent);
+            });
+            topPriorityList.querySelectorAll('li span').forEach(span => {
+                topPriorityTasks.push(span.textContent);
+            });
+            lowPriorityList.querySelectorAll('li span').forEach(span => {
+                lowPriorityTasks.push(span.textContent);
+            });
+            localStorage.setItem('todoTasks', JSON.stringify(todoTasks));
+            localStorage.setItem('topPriorityTasks', JSON.stringify(topPriorityTasks));
+            localStorage.setItem('lowPriorityTasks', JSON.stringify(lowPriorityTasks));
+        }
+
+        addTodoButton.addEventListener('click', function () {
+            const task = todoInput.value.trim();
+            if (task) {
+                addTodoTask(task);
+                todoInput.value = '';
+                updateLocalStorage();
+            } else {
+                alert("Please enter a task.");
+            }
+        });
+
+        todoInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                const task = todoInput.value.trim();
+                if (task) {
+                    addTodoTask(task);
+                    todoInput.value = '';
+                    updateLocalStorage();
+                } else {
+                    alert("Please enter a task.");
+                }
+            }
+        });
+
+        addTopPriorityButton.addEventListener('click', function () {
+            const task = topPriorityInput.value.trim();
+            if (task) {
+                addPriorityTask(task, topPriorityList);
+                topPriorityInput.value = '';
+                updateLocalStorage();
+            } else {
+                alert("Please enter a task.");
+            }
+        });
+
+        addLowPriorityButton.addEventListener('click', function () {
+            const task = lowPriorityInput.value.trim();
+            if (task) {
+                addPriorityTask(task, lowPriorityList);
+                lowPriorityInput.value = '';
+                updateLocalStorage();
+            } else {
+                alert("Please enter a task.");
+            }
+        });
+
+        topPriorityInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                const task = topPriorityInput.value.trim();
+                if (task) {
+                    addPriorityTask(task, topPriorityList);
+                    topPriorityInput.value = '';
+                    updateLocalStorage();
+                } else {
+                    alert("Please enter a task.");
+                }
+            }
+        });
+
+        lowPriorityInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                const task = lowPriorityInput.value.trim();
+                if (task) {
+                    addPriorityTask(task, lowPriorityList);
+                    lowPriorityInput.value = '';
+                    updateLocalStorage();
+                } else {
+                    alert("Please enter a task.");
+                }
+            }
+        });
+
+        window.addEventListener('load', loadTasks);
+
+        let chart;
+        const dailyCompletion = Array(31).fill(0);
+
+        function initializeChart() {
+            const ctx = document.getElementById('completionChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({ length: 31 }, (_, i) => i + 1),
+                    datasets: [{
+                        label: 'Completion Percentage (%)',
+                        data: dailyCompletion,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Days (1-31)',
+                                color: 'rgba(164, 164, 164, 1)'
+                            },
+                            grid: {
+                                color: 'rgba(104, 104, 104, 0.5)'
+                            },
+                            ticks: {
+                                color: 'rgba(164, 164, 164, 1)'
+                            }
+                        },
+                        y: {
+                            min: 0,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Completion (%)',
+                                color: 'rgba(164, 164, 164, 1)'
+                            },
+                            grid: {
+                                color: 'rgba(104, 104, 104, 0.5)'
+                            },
+                            ticks: {
+                                color: 'rgba(164, 164, 164, 1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'rgba(164, 164, 164, 1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart() {
+            chart.data.datasets[0].data = dailyCompletion;
+            chart.update();
+        }
+
+        function updateCompletionPercentage(day) {
+            const checkboxes = document.querySelectorAll(`input[data-day="${day}"]`);
+            const totalCheckboxes = checkboxes.length;
+
+            if (totalCheckboxes === 0) return;
+
+            const completedCheckboxes = Array.from(checkboxes).filter(checkbox => checkbox.checked).length;
+            const percentage = (completedCheckboxes / totalCheckboxes) * 100;
+            dailyCompletion[day - 1] = percentage;
+
+            const completionCell = document.getElementById(`completion-${day}`);
+            if (completionCell) {
+                completionCell.textContent = percentage === 0 ? '' : `${Math.round(percentage)}%`;
+            }
+
+            updateChart();
+        }
+
+        window.onload = function () {
+            initializeChart();
+            tasks.forEach(task => addTaskRow(task));
+            updateTotalCompletion();
+        };
+
+        const refreshButton = document.getElementById('refresh-btn');
+
+        refreshButton.addEventListener('click', function () {
+            taskRows.innerHTML = '';
+            tasks = [];
+            localStorage.removeItem('tasks'); // Clear tasks from localStorage
+            for (let i = 1; i <= 31; i++) {
+                const completionCell = document.getElementById(`completion-${i}`);
+                if (completionCell) completionCell.textContent = '';
+            }
+            dailyCompletion.fill(0);
+            updateChart();
+            deleteTaskButton.style.display = 'none';
+            updateTotalCompletion();
+        });
+
+        window.addEventListener('scroll', function () {
+            const docHeight = document.documentElement.scrollHeight;
+            const windowHeight = window.innerHeight;
+            const scrollPosition = window.scrollY;
+            if (scrollPosition >= docHeight - windowHeight - 10) {
+                document.getElementById('refresh-btn').style.display = 'block';
+            } else {
+                document.getElementById('refresh-btn').style.display = 'none';
+            }
+        });
+
+        const taskHeader = document.getElementById('task-header');
+
+        taskHeader.addEventListener('mouseover', function () {
+            taskHeader.style.display = 'block';
+        });
+
+        taskHeader.addEventListener('mouseleave', function () {
+            taskHeader.style.display = 'none';
+        });
+
+
+    </script>
+
+</body>
+
+</html>
