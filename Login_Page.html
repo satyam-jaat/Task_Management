@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Planner</title>
+    <link rel="icon" type="image/webp" href="title_logo.webp">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+            padding: 20px;
+        }
+        .login-container {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            backdrop-filter: blur(15px);
+        }
+        .login-container h2 { margin-bottom: 30px; color: #00eaff; font-weight: 700; font-size: 32px; text-transform: uppercase; }
+        .input-group { position: relative; margin-bottom: 20px; }
+        .input-group label { display: block; text-align: left; font-size: 18px; margin-bottom: 8px; color: #fff; font-weight: 600; }
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            color: #fff;
+            font-size: 18px;
+            outline: none;
+        }
+        .input-group input::placeholder { color: #ddd; font-size: 16px; }
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: #00bbff;
+            border: none;
+            color: black;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .login-btn:hover { background: #007fe6; }
+        .forgot-password { display: block; margin-top: 15px; font-size: 16px; color: #ddd; text-decoration: none; cursor: pointer; }
+        .forgot-password:hover { color: #c7cece; }
+        .error-message { color: red; font-size: 16px; margin-top: 12px; display: none; }
+
+        /* Forgot Password Box */
+        .forgot-box {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            text-align: left;
+        }
+        .forgot-box input { margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2><i class="fas fa-user-graduate"></i> Student Login</h2>
+        <div class="input-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter your username">
+        </div>
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+        </div>
+        <button class="login-btn" onclick="validateLogin()">Login</button>
+        <a class="forgot-password" onclick="showForgotPassword()">Forgot Password?</a>
+        <p id="error-message" class="error-message">Invalid Username or Password</p>
+
+        <!-- Forgot Password Box -->
+        <div class="forgot-box" id="forgot-box">
+            <input type="checkbox" id="robot-check" onclick="revealCredentials()"> I am not a robot
+            <p id="credentials" style="display: none; margin-top: 10px;"></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let storedUsername = localStorage.getItem("username");
+            let storedPassword = localStorage.getItem("password");
+
+            if (!storedUsername || !storedPassword) {
+                setNewUser();
+            }
+        });
+
+        function setNewUser() {
+            let newUsername = prompt("Set your username:");
+            if (!newUsername) return;
+
+            let newPassword = prompt("Set your password:");
+            if (!newPassword) return;
+
+            localStorage.setItem("username", newUsername);
+            localStorage.setItem("password", newPassword);
+            alert("Account created successfully! Please log in.");
+        }
+
+        function validateLogin() {
+            let enteredUsername = document.getElementById("username").value.trim();
+            let enteredPassword = document.getElementById("password").value.trim();
+            let errorMessage = document.getElementById("error-message");
+
+            let storedUsername = localStorage.getItem("username");
+            let storedPassword = localStorage.getItem("password");
+
+            if (enteredUsername === "" || enteredPassword === "") {
+                errorMessage.textContent = "Please fill in all fields";
+                errorMessage.style.display = "block";
+                return;
+            }
+
+            if (enteredUsername === storedUsername && enteredPassword === storedPassword) {
+                localStorage.setItem("loggedInUser", enteredUsername);
+                window.location.href = "management.html"; // Redirect after login
+            } else {
+                errorMessage.textContent = "Invalid Username or Password";
+                errorMessage.style.display = "block";
+            }
+        }
+
+        function showForgotPassword() {
+            document.getElementById("forgot-box").style.display = "block";
+        }
+
+        function revealCredentials() {
+            let checkBox = document.getElementById("robot-check");
+            let credentials = document.getElementById("credentials");
+
+            if (checkBox.checked) {
+                let storedUsername = localStorage.getItem("username") || "No user set";
+                let storedPassword = localStorage.getItem("password") || "No password set";
+
+                credentials.innerHTML = `👤 Username: <strong>${storedUsername}</strong> <br> 🔑 Password: <strong>${storedPassword}</strong>`;
+                credentials.style.display = "block";
+            } else {
+                credentials.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
